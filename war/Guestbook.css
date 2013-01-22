@@ -1,0 +1,52 @@
+/** Add css rules here for your application. */
+
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 40px 0px 40px;
+  text-align: center;
+}
+
+.gb-Label {
+  margin-right: 2px;
+  color: #616D7E;
+  font-size: 1.75em;
+}
+
+.gb-NameBox {
+  margin-right: 20px;
+}
+
+.gb-MessageBox {
+  margin-right: 2px;
+}
+
+.gb-GuestEntries {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.gb-GuestEntry {
+  padding: 2px 0px 0px 10px;
+  vertical-align: top;
+}
+
+.gb-GuestEntryOdd {
+  background-color: peachpuff;
+}
+
+.gb-GuestEntriesHeader {
+  background-color: #2062B8;
+  color: white;
+  font-style: italic;
+  padding: 5px 0px 5px 0px;
+}
+
+.gb-GuestHeader {
+  width: 200px;
+}
+
+.gb-MessageHeader {
+  width: 350px;
+}
