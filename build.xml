@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="GWTGuestbook" default="build" basedir=".">
+
+  <property file="build.properties" />  
+
+  <import file="${appengine.home}/config/user/ant-macros.xml" />
+
+  <path id="project.class.path">
+    <pathelement location="war/WEB-INF/classes" />
+    <pathelement location="${gwt.home}/gwt-user.jar" />
+    <!-- Add additional JARs used for unit testing -->
+    <pathelement location="${junit.home}/junit.jar" />
+    <pathelement location="${appengine.home}/lib/impl/appengine-api-stubs.jar" />
+    <pathelement location="${appengine.home}/lib/impl/appengine-local-runtime.jar" />
+    <fileset dir="war/WEB-INF/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <path id="tools.class.path">
+    <path refid="project.class.path" />
+      <pathelement location="${appengine.home}/lib/appengine-tools-api.jar" />
+      <fileset dir="${appengine.home}/lib/tools">
+        <include name="**/asm-*.jar" />
+        <include name="**/datanucleus-enhancer-*.jar" />
+      </fileset>
+    </path>
+
+  <target name="libs" description="Copy libs to WEB-INF/lib">
+    <mkdir dir="war/WEB-INF/lib" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.home}/gwt-servlet.jar" />
+    <!-- Add any additional server libs that need to be copied -->
+    <copy todir="war/WEB-INF/lib" flatten="true">
+      <fileset dir="${appengine.home}/lib/user">
+        <include name="**/*.jar" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="javac" depends="libs" description="Compile java source">
+    <mkdir dir="war/WEB-INF/classes" />
+    <javac srcdir="src" includes="**" encoding="utf-8" destdir="war/WEB-INF/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+      <classpath refid="project.class.path" />
+    </javac>
+    
+    <enhance failonerror="true">
+      <classpath>
+        <path refid="tools.class.path"/>
+        <pathelement path="war/WEB-INF/classes"/>
+        <fileset dir="war/WEB-INF/lib" includes="*.jar"/>
+      </classpath>
+      <fileset dir="war/WEB-INF/classes" includes="**/*.class"/>
+    </enhance>
+    <copy todir="war/WEB-INF/classes/META-INF" file="src/META-INF/jdoconfig.xml" />
+  </target>
+
+  <!-- can add additional arguments like -logLevel INFO or -style PRETTY -->
+  <target name="gwtc" depends="javac" description="GWT compile to JavaScript">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+      <classpath>
+        <pathelement location="src" />
+        <path refid="project.class.path" />
+        <pathelement location="${gwt.home}/gwt-dev.jar" />
+      </classpath>
+      <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+      <jvmarg value="-Xmx256M" />
+      <arg value="com.google.gwt.sample.gwtguestbook.Guestbook" />
+    </java>
+  </target>
+
+  <target name="runserver" depends="gwtc">
+    <java classname="com.google.appengine.tools.development.DevAppServerMain"
+          classpath="${appengine.home}/lib/appengine-tools-api.jar"
+          fork="true" >
+      <arg value="war" />
+    </java>
+  </target>
+
+  <target name="build" depends="gwtc" description="Build this project" />
+
+  <target name="clean" description="Cleans this project">
+    <delete dir="war/WEB-INF/classes" failonerror="false" />
+    <delete dir="war/guestbook" failonerror="false" />
+  </target>
+
+  <target name="javac-tests" depends="libs" description="Compile unit test classes">
+    <javac srcdir="test" includes="**" encoding="utf-8" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+       <classpath refid="project.class.path" />
+    </javac>
+  </target>
+
+  <target name="gwttest" description="Execute GWT unit tests">
+    <java failonerror="true" fork="true" classname="junit.textui.TestRunner">
+      <classpath>
+        <pathelement location="src" />
+        <pathelement location="test" />
+        <path refid="project.class.path" />
+        <path refid="tools.class.path" />
+        <pathelement location="${gwt.home}/gwt-dev.jar" />
+        <pathelement location="${junit.home}/junit.jar" />
+      </classpath>
+      <jvmarg value="-Xmx256M" />
+      <arg value="${test}" />
+    </java>
+  </target>
+
+  <target name="servertest" description="Execute server-side unit tests">
+    <junit printsummary="yes" showoutput="yes">
+      <classpath>
+        <pathelement location="src" />
+        <pathelement location="test" />
+        <path refid="project.class.path" />
+        <path refid="tools.class.path" />
+        <pathelement location="${gwt.home}/gwt-dev.jar" />
+        <pathelement location="${junit.home}/junit.jar" />
+      </classpath>
+      <jvmarg value="-Xmx256M" />
+      <test fork="yes" haltonfailure="yes" name="${test}" />
+    </junit>
+  </target>
+
+</project>
