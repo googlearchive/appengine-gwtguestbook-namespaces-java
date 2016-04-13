@@ -1,3 +1,9 @@
+![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
+
+This project is no longer actively developed or maintained.
+
+For new work on this check out [relevant link](https://github.com/GoogleCloudPlatform/java-docs-samples/tree/master/appengine/multitenancy/)
+
 ## Google App Engine Java Runtime SDK - GWT Guestbook Demo
 
 The GWT Guestbook is a sample application demonstrating how to create and deploy
